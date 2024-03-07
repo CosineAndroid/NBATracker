@@ -54,7 +54,7 @@ enum class Team(
     companion object {
         private const val TEAM_IMAGE_URL = "https://cdn.nba.com/logos/nba/%d/global/L/logo.svg"
 
-        val values = entries.toList()
+        private val values = entries.toList()
 
         fun findTeamByShortName(shortName: String): Team? {
             return values.find { it.shortName == shortName }
