@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,10 +26,8 @@ import kr.cosine.nbatracker.Line
 import kr.cosine.nbatracker.Space
 import kr.cosine.nbatracker.data.PlayerInfo
 import kr.cosine.nbatracker.enums.Team
+import kr.cosine.nbatracker.ui.theme.Color
 import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
-import kr.cosine.nbatracker.ui.theme.PlayerInfoGroupBackgroundColor
-import kr.cosine.nbatracker.ui.theme.PlayerImageBackgroundColor
-import kr.cosine.nbatracker.ui.theme.PlayerShortInfoBackgroundColor
 
 class PlayerActivity : ComponentActivity() {
 
@@ -92,7 +89,7 @@ private fun PlayerImage(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) 
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.3f)
-            .background(PlayerImageBackgroundColor)
+            .background(Color.PlayerImageBackgroundColor)
     ) {
         val team = playerInfo.team
         AsyncImage(
@@ -108,8 +105,7 @@ private fun PlayerImage(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) 
         AsyncImage(
             model = playerInfo.imageUrl,
             contentDescription = playerInfo.fullName,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }
@@ -119,13 +115,12 @@ private fun PlayerShortInfo(playerInfo: PlayerInfo) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(PlayerShortInfoBackgroundColor)
+            .background(Color.PlayerShortInfoBackgroundColor)
             .fillMaxWidth()
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(10.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             CustomText(
                 text = playerInfo.fullName,
@@ -150,7 +145,7 @@ private fun PlayerInfoGroup(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(PlayerInfoGroupBackgroundColor)
+            .background(Color.PlayerInfoGroupBackgroundColor)
             .fillMaxWidth()
     ) {
         Row(
@@ -166,8 +161,7 @@ private fun PlayerInfoGroup(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(5.dp),
-                    modifier = Modifier
-                        .weight(1f)
+                    modifier = Modifier.weight(1f)
                 ) {
                     CustomText(
                         text = info.first,
