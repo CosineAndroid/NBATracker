@@ -3,6 +3,8 @@ package kr.cosine.nbatracker.activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +12,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Card
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -26,11 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kr.cosine.nbatracker.CustomText
@@ -42,10 +41,6 @@ import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
 
 class ConferenceActivity : ComponentActivity() {
 
-    companion object {
-        val conferencePages = listOf("모두", "동부", "서부")
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -56,29 +51,32 @@ class ConferenceActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Main() {
-    val pageState = rememberPagerState()
+    val pageState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { Conference.koreanNames.size }
+    )
     val coroutineScope = rememberCoroutineScope()
 
     Column {
         Head("컨퍼런스")
         SelectConference(pageState, coroutineScope)
+        ConferenceTypeGuide()
         ScrollConferenceTeam(pageState)
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SelectConference(pageState: PagerState, scope: CoroutineScope) {
     TabRow(
         selectedTabIndex = pageState.currentPage,
-        indicator = { TabRowDefaults.Indicator(Modifier.pagerTabIndicatorOffset(pageState, it)) },
-        backgroundColor = Color.Black,
+        containerColor = Color.Black,
         contentColor = Color.Yellow
     ) {
-        ConferenceActivity.conferencePages.forEachIndexed { index, title ->
+        Conference.koreanNames.forEachIndexed { index, title ->
             Tab(
                 text = {
                     CustomText(
@@ -99,10 +97,13 @@ private fun SelectConference(pageState: PagerState, scope: CoroutineScope) {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScrollConferenceTeam(pageState: PagerState) {
-    HorizontalPager(count = ConferenceActivity.conferencePages.size, state = pageState) { page ->
+    HorizontalPager(
+        state = pageState,
+        userScrollEnabled = false
+    ) { page ->
         LazyColumn {
             when (page) {
                 0 -> itemsIndexed(TrackerManager.getTeamInfos()) { index, item ->
@@ -122,63 +123,104 @@ private fun ScrollConferenceTeam(pageState: PagerState) {
 }
 
 @Composable
+private fun ConferenceTypeGuide() {
+    Row(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .height(30.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly)
+    {
+        CustomText(
+            text = "순위",
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            modifier = Modifier.weight(0.1f)
+        )
+        CustomText(
+            text = "팀",
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            modifier = Modifier.weight(0.2f)
+        )
+        CustomText(
+            text = "승",
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            modifier = Modifier.weight(0.1f)
+        )
+        CustomText(
+            text = "패",
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            modifier = Modifier.weight(0.1f)
+        )
+        CustomText(
+            text = "승률",
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            modifier = Modifier.weight(0.1f)
+        )
+    }
+}
+
+@Composable
 private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .padding(2.dp)
+            .padding(3.dp)
             .clickable {
 
             },
-        backgroundColor = Color.White,
-        contentColor = Color.Black
     ) {
         Row(
             //horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp)
         ) {
             CustomText(
                 text = String.format("%02d", order + 1),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.5f)
+                modifier = Modifier.weight(0.05f)
             )
             AsyncImage(
                 model = teamInfo.team.getModel(),
                 contentDescription = teamInfo.team.koreanName,
-                modifier = Modifier
-                    .weight(0.1f)
-                    .size(40.dp, 40.dp)
+                modifier = Modifier.weight(0.1f)
             )
             CustomText(
                 text = teamInfo.team.koreanName,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Light,
+                modifier = Modifier.weight(0.45f),
+            )
+            CustomText(
+                text = teamInfo.totalRecord.win,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.4f),
+                modifier = Modifier.weight(0.07f)
             )
             CustomText(
                 fontSize = 12.sp,
-                text = teamInfo.totalRecord.total.toString(),
+                text = teamInfo.totalRecord.lose,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.05f)
-            )
-            CustomText(
-                text = teamInfo.totalRecord.win.toString(),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.05f)
+                modifier = Modifier.weight(0.07f)
             )
             CustomText(
                 fontSize = 12.sp,
-                text = teamInfo.totalRecord.lose.toString(),
+                text = teamInfo.totalRecord.rateText,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.05f)
+                modifier = Modifier.weight(0.1f)
             )
         }
     }
