@@ -15,21 +15,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -43,27 +38,17 @@ import kr.cosine.nbatracker.activity.PlayerListActivity
 import kr.cosine.nbatracker.activity.ConferenceActivity
 import kr.cosine.nbatracker.manager.TrackerManager
 import kr.cosine.nbatracker.service.TrackerService
+import kr.cosine.nbatracker.ui.theme.Font
 import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : ComponentActivity(), CoroutineScope {
-
-    companion object {
-        lateinit var esamanru: FontFamily
-            private set
-    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        esamanru = FontFamily(
-            Font(R.font.esamanru_light, FontWeight.Light, FontStyle.Normal),
-            Font(R.font.esamanru_medium, FontWeight.Medium, FontStyle.Normal),
-            Font(R.font.esamanru_bold, FontWeight.Bold, FontStyle.Normal),
-        )
 
         launch {
             runBlocking {
@@ -137,16 +122,16 @@ fun Head(text: String) {
 @Composable
 fun CustomText(
     modifier: Modifier = Modifier,
-    text: String,
+    text: Any,
     fontSize: TextUnit,
     fontWeight: FontWeight = FontWeight.Light,
     color: Color = Color.Black
 ) {
     var newFontSize by remember { mutableStateOf(fontSize) }
     Text(
-        text = text,
+        text = text.toString(),
         color = color,
-        fontFamily = MainActivity.esamanru,
+        fontFamily = Font.esamanru,
         fontWeight = fontWeight,
         fontSize = newFontSize,
         modifier = modifier,
@@ -162,10 +147,10 @@ fun CustomText(
 
 @Composable
 fun Line(thickness: Dp = 2.dp) {
-    Divider(
-        color = Color.White,
+    HorizontalDivider(
+        modifier = Modifier.fillMaxWidth(),
         thickness = thickness,
-        modifier = Modifier.fillMaxWidth()
+        color = Color.White
     )
 }
 
