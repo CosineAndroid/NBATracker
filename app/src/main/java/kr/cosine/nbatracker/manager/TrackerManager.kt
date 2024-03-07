@@ -17,13 +17,13 @@ object TrackerManager {
         this.playerInfoMap = playerInfoMap
     }
 
-    fun getTeamInfos(): List<TeamInfo> = teamInfoMap.values.toList()
+    fun getTeamInfos(): List<TeamInfo> = teamInfoMap.values.sortedByDescending { it.totalRecord.rate }
 
     fun setTeamInfoMap(teamInfoMap: Map<Team, TeamInfo>) {
         this.teamInfoMap = teamInfoMap
     }
 
     fun getTeamInfosByConference(conference: Conference): List<TeamInfo> {
-        return teamInfoMap.filter { it.key.conference == conference }.values.toList()
+        return getTeamInfos().filter { it.team.conference == conference }
     }
 }
