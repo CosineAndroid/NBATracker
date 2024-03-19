@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -124,12 +125,14 @@ fun CustomText(
     modifier: Modifier = Modifier,
     text: Any,
     fontSize: TextUnit,
+    textAlign: TextAlign? = null,
     fontWeight: FontWeight = FontWeight.Light,
     color: Color = Color.Black
 ) {
     var newFontSize by remember { mutableStateOf(fontSize) }
     Text(
         text = text.toString(),
+        textAlign = textAlign,
         color = color,
         fontFamily = Font.esamanru,
         fontWeight = fontWeight,

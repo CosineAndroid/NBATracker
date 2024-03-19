@@ -112,7 +112,7 @@ private fun Player(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Uni
                 CustomText(
                     text = playerInfo.team.koreanName,
                     fontSize = 15.sp,
-                    color = Color.TeamColor
+                    color = Color.Team
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(7.dp)

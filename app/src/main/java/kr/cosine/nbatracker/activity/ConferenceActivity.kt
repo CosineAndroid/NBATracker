@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -126,12 +127,15 @@ private fun ScrollConferenceTeam(pageState: PagerState) {
 private fun ConferenceTypeGuide() {
     Row(
         modifier = Modifier
-            .background(Color.White)
             .fillMaxWidth()
-            .height(30.dp),
+            .height(30.dp)
+            .background(Color.White)
+            .padding(
+                horizontal = 10.dp
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly)
-    {
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         CustomText(
             text = "순위",
             fontWeight = FontWeight.Medium,
@@ -183,26 +187,28 @@ private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
             },
     ) {
         Row(
-            //horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(
+                horizontal = 10.dp
+            )
         ) {
             CustomText(
                 text = String.format("%02d", order + 1),
+                textAlign = TextAlign.Center,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier.weight(0.05f)
+                modifier = Modifier.weight(0.035f).background(Color.Red)
             )
             AsyncImage(
                 model = teamInfo.team.getModel(),
                 contentDescription = teamInfo.team.koreanName,
-                modifier = Modifier.weight(0.1f)
+                modifier = Modifier.weight(0.08f).background(Color.Yellow)
             )
             CustomText(
                 text = teamInfo.team.koreanName,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier.weight(0.45f),
+                modifier = Modifier.weight(0.45f).background(Color.Green),
             )
             CustomText(
                 text = teamInfo.totalRecord.win,

@@ -89,7 +89,7 @@ private fun PlayerImage(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) 
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.3f)
-            .background(Color.PlayerImageBackgroundColor)
+            .background(Color.PlayerImageBackground)
     ) {
         val team = playerInfo.team
         AsyncImage(
@@ -115,7 +115,7 @@ private fun PlayerShortInfo(playerInfo: PlayerInfo) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(Color.PlayerShortInfoBackgroundColor)
+            .background(Color.PlayerShortInfoBackground)
             .fillMaxWidth()
     ) {
         Column(
@@ -145,7 +145,7 @@ private fun PlayerInfoGroup(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(Color.PlayerInfoGroupBackgroundColor)
+            .background(Color.PlayerInfoGroupBackground)
             .fillMaxWidth()
     ) {
         Row(
