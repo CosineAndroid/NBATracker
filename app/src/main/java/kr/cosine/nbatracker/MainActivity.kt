@@ -1,5 +1,6 @@
 package kr.cosine.nbatracker
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -37,7 +38,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kr.cosine.nbatracker.activity.PlayerListActivity
 import kr.cosine.nbatracker.activity.ConferenceActivity
-import kr.cosine.nbatracker.manager.TrackerManager
+import kr.cosine.nbatracker.model.PlayerInfoRegistry
+import kr.cosine.nbatracker.model.TeamInfoRegistry
 import kr.cosine.nbatracker.service.TrackerService
 import kr.cosine.nbatracker.ui.theme.Font
 import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
@@ -48,16 +50,16 @@ class MainActivity : ComponentActivity(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         launch {
             runBlocking {
                 val playerInfoMap = TrackerService.getPlayerInfoMap()
-                TrackerManager.setPlayerInfoMap(playerInfoMap)
+                PlayerInfoRegistry.setPlayerInfoMap(playerInfoMap)
 
                 val teamInfoMap = TrackerService.getTeamInfoMap()
-                TrackerManager.setTeamInfoMap(teamInfoMap)
+                TeamInfoRegistry.setTeamInfoMap(teamInfoMap)
             }
         }
         setContent {

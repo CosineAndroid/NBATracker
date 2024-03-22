@@ -74,7 +74,6 @@ object TrackerService {
             val rankJson = teamJson["rank"] as JSONObject
             val homeRecord = rankJson.getRecord("home")
             val awayRecord = rankJson.getRecord("away")
-            val totalRecord = homeRecord + awayRecord
             val streak = rankJson["streak"].toString()
 
             val statJson = teamJson["stat"] as JSONObject
@@ -84,7 +83,7 @@ object TrackerService {
             val againstPoints = statJson["lostPtsAvg"].toDoubleOrZero().round()
             val teamStat = TeamStat(points, rebound, assist, againstPoints)
 
-            team to TeamInfo(team, totalRecord, homeRecord, awayRecord, streak, teamStat)
+            team to TeamInfo(team, homeRecord, awayRecord, streak, teamStat)
         }.toMap()
     }
 

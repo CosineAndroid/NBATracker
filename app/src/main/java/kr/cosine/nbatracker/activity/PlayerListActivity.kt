@@ -23,11 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import kr.cosine.nbatracker.CustomText
 import kr.cosine.nbatracker.Head
 import kr.cosine.nbatracker.data.PlayerInfo
-import kr.cosine.nbatracker.manager.TrackerManager
+import kr.cosine.nbatracker.model.PlayerInfoRegistry
 import kr.cosine.nbatracker.ui.theme.Color
 import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
 
@@ -62,7 +63,7 @@ private fun PlayerList(playerClickScope: (PlayerInfo) -> Unit) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        itemsIndexed(TrackerManager.getPlayerInfos()) { _, item ->
+        itemsIndexed(PlayerInfoRegistry.getPlayerInfos()) { _, item ->
             Player(item, playerClickScope)
         }
     }
@@ -82,7 +83,8 @@ private fun Player(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Uni
             .height(80.dp)
             .padding(
                 horizontal = 7.dp
-            ).clickable {
+            )
+            .clickable {
                 playerClickScope(playerInfo)
             }
     ) {
