@@ -8,6 +8,6 @@ enum class Conference(
     WEST("서부");
 
     companion object {
-        val koreanNames = entries.map { it.koreanName }
+        val koreanNames = entries.map(Conference::koreanName)
     }
 }
