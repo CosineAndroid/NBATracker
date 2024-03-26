@@ -1,6 +1,5 @@
 package kr.cosine.nbatracker
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,7 +48,6 @@ class MainActivity : ComponentActivity(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
-    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launch {
@@ -91,7 +88,7 @@ private fun MainButton(height: Float, value: String, clickScope: () -> Unit) {
             },
         shape = RoundedCornerShape(10.dp)
     ) {
-        CustomText(
+        Text(
             text = value,
             fontSize = 70.sp,
             fontWeight = FontWeight.Medium,
@@ -108,7 +105,7 @@ fun Head(text: String) {
             .fillMaxWidth()
             .background(Color.Black)
     ) {
-        CustomText(
+        Text(
             text = text,
             color = Color.White,
             fontSize = 20.sp,
@@ -123,7 +120,7 @@ fun Head(text: String) {
 }
 
 @Composable
-fun CustomText(
+fun Text(
     modifier: Modifier = Modifier,
     text: Any,
     fontSize: TextUnit,
@@ -132,7 +129,7 @@ fun CustomText(
     color: Color = Color.Black
 ) {
     var newFontSize by remember { mutableStateOf(fontSize) }
-    Text(
+    androidx.compose.material3.Text(
         text = text.toString(),
         textAlign = textAlign,
         color = color,
