@@ -36,4 +36,22 @@ object TeamInfoRegistry {
     fun getTeamInfosByConference(conference: Conference): List<TeamInfo> {
         return getTeamInfos().filter { it.team.conference == conference }
     }
+
+    fun getRanking(team: Team, conference: Conference = Conference.ALL, reverse: Boolean = false, filter: (TeamInfo) -> Double): Int {
+        var sortedEntries = teamInfoMap.entries.toList()
+        if (conference != Conference.ALL) {
+            sortedEntries = sortedEntries.filter {
+                it.key.conference == conference
+            }
+        }
+        sortedEntries = sortedEntries.sortedByDescending {
+            filter(it.value)
+        }
+        if (reverse) {
+            sortedEntries = sortedEntries.reversed()
+        }
+        return sortedEntries.indexOfFirst {
+            it.key == team
+        } + 1
+    }
 }
