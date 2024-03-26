@@ -6,8 +6,8 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 
 enum class Team(
-    val id: Long,
-    val fullName: String,
+    private val id: Long,
+    val englishName: String,
     val shortName: String,
     val koreanName: String,
     val conference: Conference
