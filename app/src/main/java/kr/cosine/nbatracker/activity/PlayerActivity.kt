@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import kr.cosine.nbatracker.CustomText
+import kr.cosine.nbatracker.Text
 import kr.cosine.nbatracker.Line
 import kr.cosine.nbatracker.Space
 import kr.cosine.nbatracker.data.PlayerInfo
@@ -94,7 +94,7 @@ private fun PlayerImage(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) 
         val team = playerInfo.team
         AsyncImage(
             model = team.getModel(),
-            contentDescription = team.fullName,
+            contentDescription = team.englishName,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .size(140.dp)
@@ -122,14 +122,14 @@ private fun PlayerShortInfo(playerInfo: PlayerInfo) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(10.dp)
         ) {
-            CustomText(
+            Text(
                 text = playerInfo.fullName,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Space(3.dp)
-            CustomText(
+            Text(
                 text = "${playerInfo.team.koreanName} ${playerInfo.jerseyNumber}번 ${playerInfo.position.koreanName}",
                 fontSize = 18.sp,
                 color = Color.White
@@ -163,12 +163,12 @@ private fun PlayerInfoGroup(
                     verticalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    CustomText(
+                    Text(
                         text = info.first,
                         fontSize = titleSize,
                         color = Color.White
                     )
-                    CustomText(
+                    Text(
                         text = info.second.toString(),
                         fontSize = descriptionSize,
                         color = Color.White
