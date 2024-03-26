@@ -1,5 +1,6 @@
 package kr.cosine.nbatracker.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,14 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kr.cosine.nbatracker.CustomText
+import kr.cosine.nbatracker.Text
 import kr.cosine.nbatracker.Head
 import kr.cosine.nbatracker.data.TeamInfo
 import kr.cosine.nbatracker.enums.Conference
@@ -48,16 +47,21 @@ class ConferenceActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             NBATrackerTheme {
-                Main()
+                Main(this::openTeamActivity)
             }
         }
     }
+
+    private fun openTeamActivity(teamInfo: TeamInfo) {
+        val intent = Intent(this, TeamActivity::class.java)
+        intent.putExtra("TeamInfo", teamInfo)
+        startActivity(intent)
+    }
 }
 
-@Preview
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Main() {
+private fun Main(teamClickScope: (TeamInfo) -> Unit) {
     val pageState = rememberPagerState(
         initialPage = 0,
         pageCount = { Conference.koreanNames.size }
@@ -68,7 +72,7 @@ private fun Main() {
         Head("컨퍼런스")
         SelectConference(pageState, coroutineScope)
         ConferenceTypeGuide()
-        ScrollConferenceTeam(pageState)
+        ScrollConferenceTeam(pageState, teamClickScope)
     }
 }
 
@@ -83,7 +87,7 @@ private fun SelectConference(pageState: PagerState, scope: CoroutineScope) {
         Conference.koreanNames.forEachIndexed { index, title ->
             Tab(
                 text = {
-                    CustomText(
+                    Text(
                         text = title,
                         fontSize = 15.sp,
                         color = Color.White,
@@ -103,7 +107,7 @@ private fun SelectConference(pageState: PagerState, scope: CoroutineScope) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ScrollConferenceTeam(pageState: PagerState) {
+private fun ScrollConferenceTeam(pageState: PagerState, teamClickScope: (TeamInfo) -> Unit) {
     HorizontalPager(
         state = pageState,
         userScrollEnabled = false
@@ -111,15 +115,15 @@ private fun ScrollConferenceTeam(pageState: PagerState) {
         LazyColumn {
             when (page) {
                 0 -> itemsIndexed(TeamInfoRegistry.getTeamInfos()) { index, item ->
-                    ConferenceTeam(index, item)
+                    ConferenceTeam(index, item, teamClickScope)
                 }
 
                 1 -> itemsIndexed(TeamInfoRegistry.getTeamInfosByConference(Conference.EAST)) { index, item ->
-                    ConferenceTeam(index, item)
+                    ConferenceTeam(index, item, teamClickScope)
                 }
 
                 2 -> itemsIndexed(TeamInfoRegistry.getTeamInfosByConference(Conference.WEST)) { index, item ->
-                    ConferenceTeam(index, item)
+                    ConferenceTeam(index, item, teamClickScope)
                 }
             }
         }
@@ -139,31 +143,31 @@ private fun ConferenceTypeGuide() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        CustomText(
+        Text(
             text = "순위",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             modifier = Modifier.weight(0.08f)
         )
-        CustomText(
+        Text(
             text = "팀",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             modifier = Modifier.weight(0.30f)
         )
-        CustomText(
+        Text(
             text = "승",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             modifier = Modifier.weight(0.049f)
         )
-        CustomText(
+        Text(
             text = "패",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             modifier = Modifier.weight(0.048f)
         )
-        CustomText(
+        Text(
             text = "승률",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
@@ -173,7 +177,11 @@ private fun ConferenceTypeGuide() {
 }
 
 @Composable
-private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
+private fun ConferenceTeam(
+    order: Int,
+    teamInfo: TeamInfo,
+    teamClickScope: (TeamInfo) -> Unit
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -181,13 +189,13 @@ private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
+        onClick = {
+            teamClickScope(teamInfo)
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .padding(3.dp)
-            .clickable {
-
-            },
+            .padding(3.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -195,7 +203,7 @@ private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
                 horizontal = 10.dp
             )
         ) {
-            CustomText(
+            Text(
                 text = String.format("%02d", order + 1),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
@@ -211,7 +219,7 @@ private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
                     .weight(0.08f)
                     .background(Color.Yellow)
             )
-            CustomText(
+            Text(
                 text = teamInfo.team.koreanName,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Light,
@@ -219,19 +227,19 @@ private fun ConferenceTeam(order: Int, teamInfo: TeamInfo) {
                     .weight(0.45f)
                     .background(Color.Green),
             )
-            CustomText(
+            Text(
                 text = teamInfo.totalRecord.win,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
                 modifier = Modifier.weight(0.07f)
             )
-            CustomText(
+            Text(
                 fontSize = 12.sp,
                 text = teamInfo.totalRecord.lose,
                 fontWeight = FontWeight.Light,
                 modifier = Modifier.weight(0.07f)
             )
-            CustomText(
+            Text(
                 fontSize = 12.sp,
                 text = teamInfo.totalRecord.rateText,
                 fontWeight = FontWeight.Light,
