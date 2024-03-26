@@ -23,9 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import kr.cosine.nbatracker.CustomText
+import kr.cosine.nbatracker.Text
 import kr.cosine.nbatracker.Head
 import kr.cosine.nbatracker.data.PlayerInfo
 import kr.cosine.nbatracker.model.PlayerInfoRegistry
@@ -78,15 +77,15 @@ private fun Player(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Uni
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
+        onClick = {
+            playerClickScope(playerInfo)
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
             .padding(
                 horizontal = 7.dp
             )
-            .clickable {
-                playerClickScope(playerInfo)
-            }
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -106,12 +105,12 @@ private fun Player(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Uni
                 verticalArrangement = Arrangement.spacedBy(5.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                CustomText(
+                Text(
                     text = playerInfo.fullName,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
                 )
-                CustomText(
+                Text(
                     text = playerInfo.team.koreanName,
                     fontSize = 15.sp,
                     color = Color.Team
@@ -123,12 +122,12 @@ private fun Player(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Uni
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CustomText(
+                        Text(
                             text = "등번호",
                             fontSize = 10.sp,
                             color = Color.Gray
                         )
-                        CustomText(
+                        Text(
                             text = playerInfo.jerseyNumber.toString(),
                             fontSize = 15.sp
                         )
@@ -137,12 +136,12 @@ private fun Player(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Uni
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CustomText(
+                        Text(
                             text = "포지션",
                             fontSize = 10.sp,
                             color = Color.Gray
                         )
-                        CustomText(
+                        Text(
                             text = playerInfo.position.koreanName,
                             fontSize = 15.sp
                         )
