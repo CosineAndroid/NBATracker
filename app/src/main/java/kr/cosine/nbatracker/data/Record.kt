@@ -1,9 +1,11 @@
 package kr.cosine.nbatracker.data
 
+import java.io.Serializable
+
 data class Record(
     val win: Long,
     val lose: Long
-) {
+) : Serializable {
 
     val total = win + lose
 
