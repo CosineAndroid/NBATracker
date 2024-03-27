@@ -90,8 +90,8 @@ private fun SelectConference(pageState: PagerState, scope: CoroutineScope) {
                     Text(
                         text = title,
                         fontSize = 15.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
                     )
                 },
                 selected = pageState.currentPage == index,
