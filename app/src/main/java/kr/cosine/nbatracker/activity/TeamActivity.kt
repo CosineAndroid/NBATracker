@@ -1,6 +1,8 @@
 package kr.cosine.nbatracker.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,21 +41,37 @@ class TeamActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val teamInfo = intent.getSerializableExtra("TeamInfo") as TeamInfo
+        val team = intent.getSerializableExtra("Team") as? Team
+        val teamInfo = if (team == null) {
+            intent.getSerializableExtra("TeamInfo") as? TeamInfo
+        } else {
+            TeamInfoRegistry.findTeamInfo(team)
+        } ?: run {
+            Toast.makeText(this, "팀 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
         setContent {
             NBATrackerTheme {
-                TeamView(teamInfo)
+                Main(teamInfo, this::openPlayerActivity)
             }
         }
+    }
+
+    private fun openPlayerActivity(playerInfo: PlayerInfo) {
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra("PlayerInfo", playerInfo)
+        intent.putExtra("Finish", true)
+        startActivity(intent)
     }
 }
 
 @Composable
-private fun TeamView(teamInfo: TeamInfo) {
+private fun Main(teamInfo: TeamInfo, playerClickScope: (PlayerInfo) -> Unit) {
     Column {
         TeamCard(teamInfo)
-        TeamPlayerCard(teamInfo.team)
+        TeamPlayerCard(teamInfo.team, playerClickScope)
     }
 }
 
@@ -62,7 +79,7 @@ private fun TeamView(teamInfo: TeamInfo) {
 private fun TeamCard(teamInfo: TeamInfo) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color.Black
+            containerColor = teamInfo.team.color
         ),
         shape = RoundedCornerShape(
             bottomStart = 10.dp,
@@ -80,29 +97,32 @@ private fun TeamCard(teamInfo: TeamInfo) {
 private fun TeamInfo(teamInfo: TeamInfo) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.padding(
+            horizontal = 5.dp
+        )
     ) {
-        TeamInfoImage(teamInfo)
-        TeamInfoDescription(teamInfo)
+        TeamInfoImage(teamInfo, Modifier.weight(0.35f))
+        TeamInfoDescription(teamInfo, Modifier.weight(0.65f))
     }
 }
 
 @Composable
-private fun TeamInfoImage(teamInfo: TeamInfo) {
+private fun TeamInfoImage(teamInfo: TeamInfo, modifier: Modifier = Modifier) {
     val team = teamInfo.team
     AsyncImage(
         model = team.getModel(),
         contentDescription = team.shortName,
-        modifier = Modifier.size(140.dp)
+        modifier = modifier
     )
 }
 
 @Composable
-private fun TeamInfoDescription(teamInfo: TeamInfo) {
+private fun TeamInfoDescription(teamInfo: TeamInfo, modifier: Modifier = Modifier) {
     val team = teamInfo.team
     Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.SpaceBetween
+        modifier = modifier.padding(
+            horizontal = 5.dp
+        )
     ) {
         Text(
             text = team.koreanName,
@@ -198,14 +218,14 @@ private fun TeamStatCard(statName: String, rank: Int, stat: Double, modifier: Mo
 
 
 @Composable
-private fun TeamPlayerCard(team: Team) {
+private fun TeamPlayerCard(team: Team, playerClickScope: (PlayerInfo) -> Unit) {
     TeamPlayerTypeGuide()
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(Color.White)
     ) {
         val teamPlayers = PlayerInfoRegistry.getPlayerInfosByTeam(team)
-        itemsIndexed(teamPlayers) { _, playerInfo -> TeamPlayer(playerInfo) }
+        itemsIndexed(teamPlayers) { _, playerInfo -> TeamPlayer(playerInfo, playerClickScope) }
     }
 }
 
@@ -214,9 +234,11 @@ private fun TeamPlayerTypeGuide() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(30.dp)
+            .fillMaxHeight(0.04f)
             .background(Color.White)
-            .padding(horizontal = 13.dp),
+            .padding(
+                horizontal = 13.dp
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -244,7 +266,7 @@ private fun TeamPlayerTypeGuide() {
 }
 
 @Composable
-private fun TeamPlayer(playerInfo: PlayerInfo) {
+private fun TeamPlayer(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
@@ -253,6 +275,9 @@ private fun TeamPlayer(playerInfo: PlayerInfo) {
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
+        onClick = {
+            playerClickScope(playerInfo)
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
@@ -273,20 +298,20 @@ private fun TeamPlayer(playerInfo: PlayerInfo) {
         ) {
             Text(
                 text = playerInfo.fullName,
-                fontSize = 15.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)
             )
             Text(
                 text = playerInfo.jerseyNumber,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(0.2f)
             )
             Text(
                 text = playerInfo.position.koreanName,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(0.2f)
