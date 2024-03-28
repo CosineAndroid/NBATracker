@@ -25,6 +25,10 @@ object TeamInfoRegistry {
         )
     )
 
+    fun findTeamInfo(team: Team): TeamInfo? {
+        return teamInfoMap[team]
+    }
+
     fun getTeamInfos(): List<TeamInfo> {
         return teamInfoMap.values.sortedByDescending { it.totalRecord.rate }
     }
@@ -34,7 +38,9 @@ object TeamInfoRegistry {
     }
 
     fun getTeamInfosByConference(conference: Conference): List<TeamInfo> {
-        return getTeamInfos().filter { it.team.conference == conference }
+        return getTeamInfos().filter {
+            conference == Conference.ALL || it.team.conference == conference
+        }
     }
 
     fun getRanking(team: Team, conference: Conference = Conference.ALL, reverse: Boolean = false, filter: (TeamInfo) -> Double): Int {
