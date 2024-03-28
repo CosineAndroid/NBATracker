@@ -35,27 +35,30 @@ class PlayerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val playerInfo = intent.getSerializableExtra("PlayerInfo") as PlayerInfo
+        val finish = intent.getBooleanExtra("Finish", false)
 
         setContent {
             NBATrackerTheme {
-                PlayerInfoScreen(playerInfo, this::openTeamActivity)
+                Main(playerInfo) {
+                    if (finish) finish() else openTeamActivity(it)
+                }
             }
         }
     }
 
     private fun openTeamActivity(team: Team) {
-        val intent = Intent(this, ConferenceActivity::class.java)
-        intent.putExtra("TeamInfo", team) // 데이터 바꿔야함
+        val intent = Intent(this, TeamActivity::class.java)
+        intent.putExtra("Team", team)
         startActivity(intent)
     }
 }
 
 @Composable
-private fun PlayerInfoScreen(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) {
+private fun Main(playerInfo: PlayerInfo, teamClickScope: (Team) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        PlayerImage(playerInfo, clickTeamScope)
+        PlayerImage(playerInfo, teamClickScope)
         Line()
         PlayerShortInfo(playerInfo)
         Line()
@@ -84,7 +87,7 @@ private fun PlayerInfoScreen(playerInfo: PlayerInfo, clickTeamScope: (Team) -> U
 }
 
 @Composable
-private fun PlayerImage(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) {
+private fun PlayerImage(playerInfo: PlayerInfo, teamClickScope: (Team) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,7 +102,7 @@ private fun PlayerImage(playerInfo: PlayerInfo, clickTeamScope: (Team) -> Unit) 
                 .align(Alignment.TopStart)
                 .size(140.dp)
                 .clickable {
-                    clickTeamScope(playerInfo.team)
+                    teamClickScope(playerInfo.team)
                 }
         )
         AsyncImage(
@@ -115,8 +118,9 @@ private fun PlayerShortInfo(playerInfo: PlayerInfo) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(Color.PlayerShortInfoBackground)
             .fillMaxWidth()
+            .background(Color.PlayerShortInfoBackground)
+
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -128,7 +132,7 @@ private fun PlayerShortInfo(playerInfo: PlayerInfo) {
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Space(3.dp)
+            Space(height = 3.dp)
             Text(
                 text = "${playerInfo.team.koreanName} ${playerInfo.jerseyNumber}번 ${playerInfo.position.koreanName}",
                 fontSize = 18.sp,
@@ -145,8 +149,8 @@ private fun PlayerInfoGroup(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(Color.PlayerInfoGroupBackground)
             .fillMaxWidth()
+            .background(Color.PlayerInfoGroupBackground)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
