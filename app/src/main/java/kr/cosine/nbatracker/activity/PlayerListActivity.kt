@@ -89,7 +89,8 @@ private fun PlayerSearchBar(viewModel: PlayerListViewModel = viewModel()) {
                     .background(
                         color = Color.SearchBar,
                         shape = RoundedCornerShape(8.dp)
-                    ).padding(4.dp),
+                    )
+                    .padding(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -112,6 +113,7 @@ private fun PlayerSearchBar(viewModel: PlayerListViewModel = viewModel()) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.07f)
+            .background(Color.White)
             .padding(7.dp)
     )
 }
@@ -125,9 +127,11 @@ private fun PlayerCardList(playerClickScope: (PlayerInfo) -> Unit, viewModel: Pl
             .fillMaxHeight()
             .background(Color.White)
     ) {
+        item { Space(height = 1.dp) }
         itemsIndexed(PlayerInfoRegistry.getPlayerInfos(searchInput)) { _, item ->
             PlayerCard(item, playerClickScope)
         }
+        item { Space(height = 1.dp) }
     }
 }
 
