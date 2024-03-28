@@ -46,7 +46,16 @@ enum class Team(
     NEW_ORLEANS_PELICANS(1610612740, "New Orleans Pelicans", "NOP", "뉴올리언스 펠리컨스", Conference.WEST, 0xFF002B5C),
     SAN_ANTONIO_SPURS(1610612759, "San Antonio Spurs", "SAS", "샌안토니오 스퍼스", Conference.WEST, 0xFF218A73);
 
+    private val lowercaseEnglishName = englishName.lowercase()
+    private val lowercaseShortName = shortName.lowercase()
+
     val color = Color(colorCode)
+
+    fun isMatch(text: String): Boolean {
+        return lowercaseEnglishName.contains(text) ||
+                lowercaseShortName.contains(text) ||
+                koreanName.contains(text)
+    }
 
     @Composable
     fun getModel(): ImageRequest {

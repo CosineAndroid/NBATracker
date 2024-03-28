@@ -7,10 +7,13 @@ object PlayerInfoRegistry {
 
     private var playerInfoMap = emptyMap<Long, PlayerInfo>()
 
-    fun getPlayerInfos(word: String = ""): List<PlayerInfo> {
+    fun getPlayerInfos(input: String = ""): List<PlayerInfo> {
+        val word = input.lowercase()
         return playerInfoMap.values.filter {
             if (word.isEmpty()) return@filter true
-            it.fullName.lowercase().contains(word.lowercase())
+            it.fullName.lowercase().contains(word) ||
+                    it.team.isMatch(word) ||
+                    it.position.koreanName.contains(word)
         }.toList()
     }
 
