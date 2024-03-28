@@ -8,6 +8,10 @@ enum class Conference(
     WEST("서부");
 
     companion object {
+        val values = entries
+
         val koreanNames = entries.map(Conference::koreanName)
+
+        operator fun get(index: Int): Conference = values[index]
     }
 }
