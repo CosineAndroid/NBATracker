@@ -40,7 +40,7 @@ object TrackerService {
                 val lastName = playerJson["PLAYER_LAST_NAME"] as String
                 val jerseyNumber = (playerJson["JERSEY_NUMBER"] as? String)?.toIntOrNull() ?: return@mapNotNull null
                 val positionText = playerJson["POSITION"] as String
-                val position = Position.getPosition(positionText)
+                val position = Position.findPosition(positionText) ?: return@mapNotNull null
                 val teamAbbreviation = playerJson["TEAM_ABBREVIATION"] as? String ?: return@mapNotNull null
                 val team = Team.findTeamByShortName(teamAbbreviation) ?: return@mapNotNull null
                 val height = playerJson["HEIGHT"] as String
