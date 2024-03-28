@@ -22,6 +22,8 @@ object Color {
 
     // PlayerListActivity
     val Team = Color(0xFF636363)
+    val SearchBar = Color(0xFFEFEFEF)
+    val SearchBarElement = Color(0xFF8E8E8E)
 
     // PlayerActivity
     val PlayerScreenBackground = Color(0XFFC4C4C4)
