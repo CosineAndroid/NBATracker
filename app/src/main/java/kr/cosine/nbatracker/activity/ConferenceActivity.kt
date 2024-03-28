@@ -6,12 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +34,7 @@ import kr.cosine.nbatracker.Head
 import kr.cosine.nbatracker.data.TeamInfo
 import kr.cosine.nbatracker.enums.Conference
 import kr.cosine.nbatracker.model.TeamInfoRegistry
+import kr.cosine.nbatracker.ui.theme.Color
 import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
 
 class ConferenceActivity : ComponentActivity() {
@@ -108,23 +104,13 @@ private fun SelectConference(pageState: PagerState, scope: CoroutineScope) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScrollConferenceTeam(pageState: PagerState, teamClickScope: (TeamInfo) -> Unit) {
-    HorizontalPager(
-        state = pageState,
-        userScrollEnabled = false
-    ) { page ->
-        LazyColumn {
-            when (page) {
-                0 -> itemsIndexed(TeamInfoRegistry.getTeamInfos()) { index, item ->
-                    ConferenceTeam(index, item, teamClickScope)
-                }
-
-                1 -> itemsIndexed(TeamInfoRegistry.getTeamInfosByConference(Conference.EAST)) { index, item ->
-                    ConferenceTeam(index, item, teamClickScope)
-                }
-
-                2 -> itemsIndexed(TeamInfoRegistry.getTeamInfosByConference(Conference.WEST)) { index, item ->
-                    ConferenceTeam(index, item, teamClickScope)
-                }
+    HorizontalPager(pageState) { page ->
+        LazyColumn(
+            modifier = Modifier.background(Color.White)
+        ) {
+            val conference = Conference[page]
+            itemsIndexed(TeamInfoRegistry.getTeamInfosByConference(conference)) { index, item ->
+                ConferenceTeam(index, item, teamClickScope)
             }
         }
     }
@@ -134,44 +120,43 @@ private fun ScrollConferenceTeam(pageState: PagerState, teamClickScope: (TeamInf
 private fun ConferenceTypeGuide() {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(30.dp)
             .background(Color.White)
             .padding(
-                horizontal = 10.dp
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
+                horizontal = 13.dp
+            )
     ) {
         Text(
             text = "순위",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
-            modifier = Modifier.weight(0.08f)
+            modifier = Modifier.weight(0.14f)
         )
         Text(
             text = "팀",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
-            modifier = Modifier.weight(0.30f)
+            modifier = Modifier.weight(0.45f)
         )
         Text(
             text = "승",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
-            modifier = Modifier.weight(0.049f)
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(0.07f)
         )
         Text(
             text = "패",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
-            modifier = Modifier.weight(0.048f)
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(0.07f)
         )
         Text(
             text = "승률",
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
-            modifier = Modifier.weight(0.068f)
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(0.1f)
         )
     }
 }
@@ -192,10 +177,7 @@ private fun ConferenceTeam(
         onClick = {
             teamClickScope(teamInfo)
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .padding(3.dp),
+        modifier = Modifier.padding(3.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -205,44 +187,41 @@ private fun ConferenceTeam(
         ) {
             Text(
                 text = String.format("%02d", order + 1),
-                textAlign = TextAlign.Center,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.035f)
-                    .background(Color.Red)
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(0.04f)
             )
             AsyncImage(
                 model = teamInfo.team.getModel(),
                 contentDescription = teamInfo.team.koreanName,
-                modifier = Modifier
-                    .weight(0.08f)
-                    .background(Color.Yellow)
+                modifier = Modifier.weight(0.1f).padding(4.dp)
             )
             Text(
                 text = teamInfo.team.koreanName,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier
-                    .weight(0.45f)
-                    .background(Color.Green),
+                modifier = Modifier.weight(0.45f)
             )
             Text(
                 text = teamInfo.totalRecord.win,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.weight(0.07f)
             )
             Text(
-                fontSize = 12.sp,
                 text = teamInfo.totalRecord.lose,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.weight(0.07f)
             )
             Text(
-                fontSize = 12.sp,
                 text = teamInfo.totalRecord.rateText,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.weight(0.1f)
             )
         }
