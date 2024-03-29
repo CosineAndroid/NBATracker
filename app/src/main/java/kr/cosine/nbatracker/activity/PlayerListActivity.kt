@@ -97,8 +97,9 @@ private fun PlayerSearchBar(viewModel: PlayerListViewModel = viewModel()) {
                     imageVector = Icons.Default.Search,
                     contentDescription = "",
                     tint = Color.SearchBarElement,
+                    modifier = Modifier.padding(5.dp)
                 )
-                Space(width = 8.dp)
+                Space(width = 2.dp)
                 if (searchInput.isEmpty()) {
                     Text(
                         text = "검색 (이름/팀/포지션)",
