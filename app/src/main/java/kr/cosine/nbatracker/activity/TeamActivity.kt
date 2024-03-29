@@ -1,6 +1,5 @@
 package kr.cosine.nbatracker.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -9,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,10 +58,10 @@ class TeamActivity : ComponentActivity() {
     }
 
     private fun openPlayerActivity(playerInfo: PlayerInfo) {
-        val intent = Intent(this, PlayerActivity::class.java)
+        /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("PlayerInfo", playerInfo)
         intent.putExtra("Finish", true)
-        startActivity(intent)
+        startActivity(intent)*/
     }
 }
 
@@ -71,7 +69,7 @@ class TeamActivity : ComponentActivity() {
 private fun Main(teamInfo: TeamInfo, playerClickScope: (PlayerInfo) -> Unit) {
     Column {
         TeamCard(teamInfo)
-        TeamPlayerCard(teamInfo.team, playerClickScope)
+        TeamPlayers(teamInfo.team, playerClickScope)
     }
 }
 
@@ -218,29 +216,31 @@ private fun TeamStatCard(statName: String, rank: Int, stat: Double, modifier: Mo
 
 
 @Composable
-private fun TeamPlayerCard(team: Team, playerClickScope: (PlayerInfo) -> Unit) {
-    TeamPlayerTypeGuide()
+private fun TeamPlayers(team: Team, playerClickScope: (PlayerInfo) -> Unit) {
+    SimplePlayerTypeGuide()
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(Color.White)
     ) {
         val teamPlayers = PlayerInfoRegistry.getPlayerInfosByTeam(team)
-        itemsIndexed(teamPlayers) { _, playerInfo -> TeamPlayer(playerInfo, playerClickScope) }
+        itemsIndexed(teamPlayers) { _, playerInfo ->
+            SimplePlayerCard(playerInfo, playerClickScope)
+        }
     }
 }
 
 @Composable
-private fun TeamPlayerTypeGuide() {
+fun SimplePlayerTypeGuide() {
     Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.04f)
+            .height(30.dp)
             .background(Color.White)
             .padding(
                 horizontal = 13.dp
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
+            )
     ) {
         Text(
             text = "선수",
@@ -266,7 +266,7 @@ private fun TeamPlayerTypeGuide() {
 }
 
 @Composable
-private fun TeamPlayer(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Unit) {
+fun SimplePlayerCard(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
@@ -282,12 +282,6 @@ private fun TeamPlayer(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) ->
             .fillMaxWidth()
             .height(50.dp)
             .padding(3.dp)
-            /*.clickable {
-                val intent = Intent(teamInstance, PlayerActivity::class.java)
-                intent.putExtra("PlayerInfo", playerInfo)
-                intent.putExtra("TeamImage", teamInfo.teamImage)
-                teamInstance.startActivity(intent)
-            },*/
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
