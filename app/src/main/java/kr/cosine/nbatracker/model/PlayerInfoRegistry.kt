@@ -1,6 +1,7 @@
 package kr.cosine.nbatracker.model
 
 import kr.cosine.nbatracker.data.PlayerInfo
+import kr.cosine.nbatracker.enums.Position
 import kr.cosine.nbatracker.enums.Team
 
 object PlayerInfoRegistry {
@@ -23,5 +24,9 @@ object PlayerInfoRegistry {
 
     fun getPlayerInfosByTeam(team: Team): List<PlayerInfo> {
         return playerInfoMap.values.filter { it.team == team }.sortedBy { it.position }
+    }
+
+    fun getPlayerInfosByPosition(position: Position): List<PlayerInfo> {
+        return playerInfoMap.values.filter { it.position == position }
     }
 }
