@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -195,7 +196,7 @@ private fun PlayerCard(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(90.dp)
             .padding(
                 horizontal = 7.dp
             )
@@ -224,7 +225,7 @@ private fun PlayerCardImage(playerInfo: PlayerInfo) {
         model = playerInfo.imageUrl,
         contentDescription = playerInfo.fullName,
         modifier = Modifier
-            .fillMaxWidth(0.3f)
+            .fillMaxWidth(0.32f)
             .size(100.dp)
     )
 }
@@ -232,8 +233,8 @@ private fun PlayerCardImage(playerInfo: PlayerInfo) {
 @Composable
 private fun PlayerCardInfo(playerInfo: PlayerInfo) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        modifier = Modifier.fillMaxWidth()
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxSize()
     ) {
         PlayerCardFullName(playerInfo)
         PlayerCardTeamKoreanName(playerInfo)
