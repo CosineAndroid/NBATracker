@@ -1,5 +1,6 @@
 package kr.cosine.nbatracker.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,42 +33,47 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import kr.cosine.nbatracker.Text
-import kr.cosine.nbatracker.Head
+import kr.cosine.nbatracker.Toolbar
 import kr.cosine.nbatracker.Line
+import kr.cosine.nbatracker.R
 import kr.cosine.nbatracker.Space
+import kr.cosine.nbatracker.Text
+import kr.cosine.nbatracker.activity.intent.IntentKey
+import kr.cosine.nbatracker.activity.view.model.PlayerListViewModel
+import kr.cosine.nbatracker.activity.view.model.PlayerViewModel
 import kr.cosine.nbatracker.data.PlayerInfo
 import kr.cosine.nbatracker.enums.Team
-import kr.cosine.nbatracker.model.PlayerInfoRegistry
+import kr.cosine.nbatracker.registry.PlayerInfoRegistry
 import kr.cosine.nbatracker.ui.theme.Color
 import kr.cosine.nbatracker.ui.theme.Font
-import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
 
 class PlayerListActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            NBATrackerTheme {
-                Main(
-                    teamClickScope = this::openTeamActivity
-                )
-            }
+            Main(
+                teamClickScope = this::openTeamActivity
+            )
         }
     }
 
     private fun openTeamActivity(team: Team) {
-
+        val intent = Intent(this, TeamActivity::class.java)
+        intent.putExtra(IntentKey.TEAM, team)
+        startActivity(intent)
     }
 }
 
@@ -80,7 +86,7 @@ private fun Main(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Head("선수")
+        Toolbar(stringResource(R.string.player_toolbar))
         PlayerSearchBar(playerViewModel, playerListViewModel)
         PlayerCardList(playerViewModel, playerListViewModel, teamClickScope)
     }
@@ -91,8 +97,8 @@ private fun PlayerSearchBar(
     playerViewModel: PlayerViewModel,
     playerListViewModel: PlayerListViewModel
 ) {
-    val isPopup = playerViewModel.popupStateFlow.collectAsState().value
-    val searchInput = playerListViewModel.searchInputStateFlow.collectAsState().value
+    val isPopup by playerViewModel.popupStateFlow.collectAsStateWithLifecycle()
+    val searchInput by playerListViewModel.searchInputStateFlow.collectAsStateWithLifecycle()
     BasicTextField(
         enabled = !isPopup,
         value = searchInput,
@@ -116,14 +122,14 @@ private fun PlayerSearchBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "검색",
+                    contentDescription = stringResource(R.string.player_search_bar_image_description),
                     tint = Color.SearchBarElement,
                     modifier = Modifier.padding(5.dp)
                 )
                 Space(width = 2.dp)
                 if (searchInput.isEmpty()) {
                     Text(
-                        text = "검색 (이름/팀/포지션)",
+                        text = stringResource(R.string.player_search_bar_hint),
                         fontSize = 16.sp,
                         color = Color.SearchBarElement
                     )
@@ -146,9 +152,9 @@ private fun PlayerCardList(
     playerListViewModel: PlayerListViewModel,
     teamClickScope: (Team) -> Unit
 ) {
-    val searchInput = playerListViewModel.searchInputStateFlow.collectAsState().value
-    val popupPlayerInfo = playerViewModel.popupPlayerInfoStateFlow.collectAsState().value
-    val isPopup = playerViewModel.popupStateFlow.collectAsState().value
+    val searchInput by playerListViewModel.searchInputStateFlow.collectAsStateWithLifecycle()
+    val popupPlayerInfo by playerViewModel.popupPlayerInfoStateFlow.collectAsStateWithLifecycle()
+    val isPopup by playerViewModel.popupStateFlow.collectAsStateWithLifecycle()
     Box {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -158,7 +164,10 @@ private fun PlayerCardList(
                 .background(Color.White)
         ) {
             item { Space(height = 1.dp) }
-            itemsIndexed(PlayerInfoRegistry.getPlayerInfos(searchInput)) { _, playerInfo ->
+            itemsIndexed(
+                items = PlayerInfoRegistry.getPlayerInfos(searchInput),
+                key = { id, _ -> id }
+            ) { _, playerInfo ->
                 PlayerCard(
                     isPopup = isPopup,
                     playerInfo = playerInfo
@@ -207,8 +216,8 @@ private fun PlayerCard(
             }
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
@@ -266,11 +275,11 @@ private fun PlayerCardDescriptions(playerInfo: PlayerInfo) {
         horizontalArrangement = Arrangement.spacedBy(7.dp)
     ) {
         PlayerCardDescription(
-            title = "등번호",
+            title = stringResource(R.string.jersey_number),
             description = playerInfo.jerseyNumber
         )
         PlayerCardDescription(
-            title = "포지션",
+            title = stringResource(R.string.position),
             description = playerInfo.position.koreanName
         )
     }
@@ -282,8 +291,8 @@ private fun PlayerCardDescription(
     description: Any
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
             text = title,
@@ -303,7 +312,8 @@ fun PlayerCardPopup(
     playerInfo: PlayerInfo?,
     modifier: Modifier = Modifier,
     teamClickScope: (Team) -> Unit,
-    closeClickScope: () -> Unit
+    closeClickScope: () -> Unit,
+    isTeamClickable: Boolean = true
 ) {
     AnimatedVisibility(
         visible = isPopup,
@@ -325,29 +335,29 @@ fun PlayerCardPopup(
                 .padding(1.dp)
                 .clip(roundedCornershape)
         ) {
-            PlayerImage(playerInfo, teamClickScope, closeClickScope)
+            PlayerImage(playerInfo, teamClickScope, closeClickScope, isTeamClickable)
             Line()
             PlayerShortInfo(playerInfo)
             Line()
             PlayerInfoGroup(
-                "드래프트" to playerInfo.draft
+                stringResource(R.string.player_card_draft) to playerInfo.draft
             )
             Line()
             val stat = playerInfo.playerStat
             PlayerInfoGroup(
-                "득점" to stat.points,
-                "리바운드" to stat.rebound,
-                "어시스트" to stat.assist
+                stringResource(R.string.ppg) to stat.points,
+                stringResource(R.string.rebound) to stat.rebound,
+                stringResource(R.string.assist) to stat.assist
             )
             Line()
             PlayerInfoGroup(
-                "신장" to "${playerInfo.heightCentimeter} (${playerInfo.heightInchAndFeet})",
-                "체중" to "${playerInfo.weightKilogram} (${playerInfo.weightPound})"
+                stringResource(R.string.player_card_height) to playerInfo.heightCentimeter, // (${playerInfo.heightInchAndFeet})
+                stringResource(R.string.player_card_weight) to playerInfo.weightKilogram // (${playerInfo.weightPound})
             )
             Line()
             PlayerInfoGroup(
-                "도시" to playerInfo.country,
-                "대학" to playerInfo.college
+                stringResource(R.string.player_card_country) to playerInfo.country,
+                stringResource(R.string.player_card_college) to playerInfo.college
             )
         }
     }
@@ -357,7 +367,8 @@ fun PlayerCardPopup(
 private fun PlayerImage(
     playerInfo: PlayerInfo,
     teamClickScope: (Team) -> Unit,
-    closeClickScope: () -> Unit
+    closeClickScope: () -> Unit,
+    isTeamClickable: Boolean = true
 ) {
     Box(
         modifier = Modifier
@@ -372,7 +383,9 @@ private fun PlayerImage(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .size(120.dp)
-                .clickable {
+                .clickable(
+                    enabled = isTeamClickable
+                ) {
                     teamClickScope(playerInfo.team)
                 }
         )
@@ -383,7 +396,7 @@ private fun PlayerImage(
         )
         Icon(
             imageVector = Icons.Default.Close,
-            contentDescription = "닫기",
+            contentDescription = stringResource(R.string.player_card_backspace_description),
             tint = Color.White,
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -417,7 +430,7 @@ private fun PlayerShortInfo(playerInfo: PlayerInfo) {
             )
             Space(height = 3.dp)
             Text(
-                text = "${playerInfo.team.koreanName} ${playerInfo.jerseyNumber}번 ${playerInfo.position.koreanName}",
+                text = stringResource(R.string.player_card_short_info, playerInfo.team.koreanName, playerInfo.jerseyNumber, playerInfo.position.koreanName),
                 fontSize = 18.sp,
                 color = Color.White
             )
@@ -446,8 +459,8 @@ private fun PlayerInfoGroup(
             val descriptionSize = if (isOne) 25.sp else 20.sp
             infos.forEach { info ->
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(5.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(

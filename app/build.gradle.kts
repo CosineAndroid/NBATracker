@@ -1,7 +1,17 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
 }
+
+val properties = Properties().apply {
+    load(FileInputStream(rootProject.file("local.properties")))
+}
+
+fun getProperties(key: String): String = properties[key].toString()
 
 android {
     namespace = "kr.cosine.nbatracker"
@@ -20,13 +30,23 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(getProperties("key-store-file-path"))
+            storePassword = getProperties("key-store-password")
+            keyAlias = getProperties("key-store-alias")
+            keyPassword = getProperties("key-store-password")
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -46,27 +66,22 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
 
 dependencies {
-    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.compose.material3:material3")
-    implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation("io.coil-kt:coil-svg:2.4.0")
-    implementation("org.jsoup:jsoup:1.15.3")
-    implementation("com.github.skydoves:cloudy:0.1.2")
-    implementation("com.googlecode.json-simple:json-simple:1.1.1") {
+    implementation("androidx.activity", "activity-compose", "1.9.0")
+    implementation("androidx.lifecycle", "lifecycle-viewmodel-compose", "2.7.0")
+    implementation("androidx.compose.material3", "material3", "1.2.1")
+    implementation("androidx.lifecycle", "lifecycle-runtime-compose", "2.7.0")
+    implementation("io.coil-kt", "coil-compose", "2.4.0")
+    implementation("io.coil-kt", "coil-svg", "2.4.0")
+    implementation("org.jsoup", "jsoup", "1.15.3")
+    implementation("com.github.skydoves", "cloudy", "0.1.2")
+    implementation("com.googlecode.json-simple", "json-simple", "1.1.1") {
         exclude("org.hamcrest")
     }
     /*
+    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.compose.ui:ui")
@@ -76,11 +91,10 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.34.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
     */
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("junit", "junit", "4.13.2")
+    androidTestImplementation("androidx.test.ext", "junit", "1.1.5")
+    androidTestImplementation("androidx.test.espresso", "espresso-core", "3.5.1")
+    androidTestImplementation("androidx.compose.ui", "ui-test-junit4")
+    debugImplementation("androidx.compose.ui", "ui-tooling")
+    debugImplementation("androidx.compose.ui", "ui-test-manifest")
 }

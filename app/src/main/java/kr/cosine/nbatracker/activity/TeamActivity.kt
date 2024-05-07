@@ -5,7 +5,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,30 +20,37 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import kr.cosine.nbatracker.R
 import kr.cosine.nbatracker.Text
+import kr.cosine.nbatracker.activity.intent.IntentKey
+import kr.cosine.nbatracker.activity.view.model.PlayerViewModel
 import kr.cosine.nbatracker.data.PlayerInfo
 import kr.cosine.nbatracker.data.TeamInfo
 import kr.cosine.nbatracker.enums.Team
-import kr.cosine.nbatracker.model.PlayerInfoRegistry
-import kr.cosine.nbatracker.model.TeamInfoRegistry
+import kr.cosine.nbatracker.registry.PlayerInfoRegistry
+import kr.cosine.nbatracker.registry.TeamInfoRegistry
 import kr.cosine.nbatracker.ui.theme.Color
-import kr.cosine.nbatracker.ui.theme.NBATrackerTheme
 
 class TeamActivity : ComponentActivity() {
 
+    @Suppress("deprecation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val team = intent.getSerializableExtra("Team") as? Team
+        val team = intent.getSerializableExtra(IntentKey.TEAM) as? Team
         val teamInfo = if (team == null) {
-            intent.getSerializableExtra("TeamInfo") as? TeamInfo
+            intent.getSerializableExtra(IntentKey.TEAM_INFO) as? TeamInfo
         } else {
             TeamInfoRegistry.findTeamInfo(team)
         } ?: run {
@@ -51,25 +60,16 @@ class TeamActivity : ComponentActivity() {
         }
 
         setContent {
-            NBATrackerTheme {
-                Main(teamInfo, this::openPlayerActivity)
-            }
+            Main(teamInfo)
         }
-    }
-
-    private fun openPlayerActivity(playerInfo: PlayerInfo) {
-        /*val intent = Intent(this, PlayerActivity::class.java)
-        intent.putExtra("PlayerInfo", playerInfo)
-        intent.putExtra("Finish", true)
-        startActivity(intent)*/
     }
 }
 
 @Composable
-private fun Main(teamInfo: TeamInfo, playerClickScope: (PlayerInfo) -> Unit) {
+private fun Main(teamInfo: TeamInfo) {
     Column {
         TeamCard(teamInfo)
-        TeamPlayers(teamInfo.team, playerClickScope)
+        TeamPlayers(teamInfo.team)
     }
 }
 
@@ -99,8 +99,14 @@ private fun TeamInfo(teamInfo: TeamInfo) {
             horizontal = 5.dp
         )
     ) {
-        TeamInfoImage(teamInfo, Modifier.weight(0.35f))
-        TeamInfoDescription(teamInfo, Modifier.weight(0.65f))
+        TeamInfoImage(
+            teamInfo = teamInfo,
+            modifier = Modifier.weight(0.35f)
+        )
+        TeamInfoDescription(
+            teamInfo = teamInfo,
+            modifier = Modifier.weight(0.65f)
+        )
     }
 }
 
@@ -118,6 +124,7 @@ private fun TeamInfoImage(teamInfo: TeamInfo, modifier: Modifier = Modifier) {
 private fun TeamInfoDescription(teamInfo: TeamInfo, modifier: Modifier = Modifier) {
     val team = teamInfo.team
     Column(
+        verticalArrangement = Arrangement.Center,
         modifier = modifier.padding(
             horizontal = 5.dp
         )
@@ -130,14 +137,18 @@ private fun TeamInfoDescription(teamInfo: TeamInfo, modifier: Modifier = Modifie
         )
         val totalRecord = teamInfo.totalRecord
         Text(
-            text = "${totalRecord.win}승 ${totalRecord.lose}패",
+            text = stringResource(R.string.team_win_and_lose, totalRecord.win, totalRecord.lose),
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
             color = Color.White
         )
         val ranking = TeamInfoRegistry.getRanking(team, team.conference) { it.totalRecord.rate }
         Text(
-            text = "${team.conference.koreanName}컨퍼런스 ${ranking}등",
+            text = stringResource(
+                R.string.team_conference_rank,
+                team.conference.koreanName,
+                ranking
+            ),
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
             color = Color.White
@@ -158,32 +169,33 @@ private fun TeamStat(teamInfo: TeamInfo) {
         val modifier = Modifier.weight(1f)
         val ppgStat = teamStat.points
         val ppgRank = TeamInfoRegistry.getRanking(team) { it.teamStat.points }
-        TeamStatCard("득점", ppgRank, ppgStat, modifier)
+        TeamStatCard(stringResource(R.string.ppg), ppgRank, ppgStat, modifier)
 
         val oppgStat = teamStat.againstPoints
-        val oppgRank = TeamInfoRegistry.getRanking(team, reverse = true) { it.teamStat.againstPoints }
-        TeamStatCard("실점", oppgRank, oppgStat, modifier)
+        val oppgRank =
+            TeamInfoRegistry.getRanking(team, reverse = true) { it.teamStat.againstPoints }
+        TeamStatCard(stringResource(R.string.team_oppg), oppgRank, oppgStat, modifier)
 
         val reboundStat = teamStat.rebound
         val reboundRank = TeamInfoRegistry.getRanking(team) { it.teamStat.rebound }
-        TeamStatCard("리바운드", reboundRank, reboundStat, modifier)
+        TeamStatCard(stringResource(R.string.rebound), reboundRank, reboundStat, modifier)
 
         val assistStat = teamStat.assist
         val assistRank = TeamInfoRegistry.getRanking(team) { it.teamStat.assist }
-        TeamStatCard("어시스트", assistRank, assistStat, modifier)
+        TeamStatCard(stringResource(R.string.assist), assistRank, assistStat, modifier)
     }
 }
 
 @Composable
 private fun TeamStatCard(statName: String, rank: Int, stat: Double, modifier: Modifier = Modifier) {
     Card(
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
-        shape = RoundedCornerShape(10.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(
@@ -191,8 +203,8 @@ private fun TeamStatCard(statName: String, rank: Int, stat: Double, modifier: Mo
             )
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
@@ -201,7 +213,7 @@ private fun TeamStatCard(statName: String, rank: Int, stat: Double, modifier: Mo
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "${rank}등",
+                text = stringResource(R.string.team_stat_rank, rank),
                 fontSize = 23.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -216,16 +228,42 @@ private fun TeamStatCard(statName: String, rank: Int, stat: Double, modifier: Mo
 
 
 @Composable
-private fun TeamPlayers(team: Team, playerClickScope: (PlayerInfo) -> Unit) {
+private fun TeamPlayers(
+    team: Team,
+    playerViewModel: PlayerViewModel = viewModel()
+) {
     SimplePlayerTypeGuide()
-    LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.background(Color.White)
-    ) {
-        val teamPlayers = PlayerInfoRegistry.getPlayerInfosByTeam(team)
-        itemsIndexed(teamPlayers) { _, playerInfo ->
-            SimplePlayerCard(playerInfo, playerClickScope)
+    val popupPlayerInfo by playerViewModel.popupPlayerInfoStateFlow.collectAsStateWithLifecycle()
+    val isPopup by playerViewModel.popupStateFlow.collectAsStateWithLifecycle()
+    Box {
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            userScrollEnabled = !isPopup,
+            modifier = Modifier.background(Color.White)
+        ) {
+            itemsIndexed(
+                items = PlayerInfoRegistry.getPlayerInfosByTeam(team),
+                key = { id, _ -> id }
+            ) { _, playerInfo ->
+                SimplePlayerCard(
+                    isPopup = isPopup,
+                    playerInfo = playerInfo
+                ) {
+                    playerViewModel.setPopupPlayerInfo(playerInfo)
+                    playerViewModel.setPopup(true)
+                }
+            }
         }
+        PlayerCardPopup(
+            isPopup = isPopup,
+            playerInfo = popupPlayerInfo,
+            modifier = Modifier.align(Alignment.Center),
+            teamClickScope = {},
+            closeClickScope = {
+                playerViewModel.setPopup(false)
+            },
+            isTeamClickable = false
+        )
     }
 }
 
@@ -243,20 +281,20 @@ fun SimplePlayerTypeGuide() {
             )
     ) {
         Text(
-            text = "선수",
+            text = stringResource(R.string.team_guide_player),
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
         Text(
-            text = "등번호",
+            text = stringResource(R.string.jersey_number),
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(0.2f)
         )
         Text(
-            text = "포지션",
+            text = stringResource(R.string.position),
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
@@ -266,7 +304,11 @@ fun SimplePlayerTypeGuide() {
 }
 
 @Composable
-fun SimplePlayerCard(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> Unit) {
+fun SimplePlayerCard(
+    isPopup: Boolean,
+    playerInfo: PlayerInfo,
+    playerClickScope: (PlayerInfo) -> Unit
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
@@ -275,17 +317,19 @@ fun SimplePlayerCard(playerInfo: PlayerInfo, playerClickScope: (PlayerInfo) -> U
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
-        onClick = {
-            playerClickScope(playerInfo)
-        },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
             .padding(3.dp)
+            .clickable(
+                enabled = !isPopup
+            ) {
+                playerClickScope(playerInfo)
+            }
     ) {
         Row(
-            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 10.dp)

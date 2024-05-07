@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">NBATracker</string>
+    <string name="main_player_image_description">lebron james</string>
+    <string name="player_toolbar">선수</string>
+    <string name="player_search_bar_image_description">검색</string>
+    <string name="player_search_bar_hint">검색 (이름/팀/포지션)</string>
+    <string name="player_card_draft">드래프트</string>
+    <string name="player_card_height">신장</string>
+    <string name="player_card_weight">체중</string>
+    <string name="player_card_country">도시</string>
+    <string name="player_card_college">대학</string>
+    <string name="player_card_backspace_description">닫기</string>
+    <string name="player_card_short_info">%s %d번 %s</string>
+    <string name="conference_toolbar">컨퍼런스</string>
+    <string name="conference_rank">순위</string>
+    <string name="conference_team">팀</string>
+    <string name="conference_win">승</string>
+    <string name="conference_lose">패</string>
+    <string name="conference_rate">승률</string>
+    <string name="team_win_and_lose">%d승 %d패</string>
+    <string name="team_conference_rank">%s컨퍼런스 %d등</string>
+    <string name="team_oppg">실점</string>
+    <string name="team_stat_rank">%d등</string>
+    <string name="team_guide_player">선수</string>
+    <string name="jersey_number">등번호</string>
+    <string name="position">포지션</string>
+    <string name="ppg">득점</string>
+    <string name="rebound">리바운드</string>
+    <string name="assist">어시스트</string>
 </resources>

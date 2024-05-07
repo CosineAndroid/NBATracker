@@ -4,8 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kr.cosine.nbatracker.data.Draft
 import kr.cosine.nbatracker.data.PlayerInfo
-import kr.cosine.nbatracker.data.Record
 import kr.cosine.nbatracker.data.PlayerStat
+import kr.cosine.nbatracker.data.Record
 import kr.cosine.nbatracker.data.TeamInfo
 import kr.cosine.nbatracker.data.TeamStat
 import kr.cosine.nbatracker.enums.Position
@@ -38,10 +38,12 @@ object TrackerService {
                 val playerId = playerJson["PERSON_ID"] as Long
                 val firstName = playerJson["PLAYER_FIRST_NAME"] as String
                 val lastName = playerJson["PLAYER_LAST_NAME"] as String
-                val jerseyNumber = (playerJson["JERSEY_NUMBER"] as? String)?.toIntOrNull() ?: return@mapNotNull null
+                val jerseyNumber = (playerJson["JERSEY_NUMBER"] as? String)?.toIntOrNull()
+                    ?: return@mapNotNull null
                 val positionText = playerJson["POSITION"] as String
                 val position = Position.findPosition(positionText) ?: return@mapNotNull null
-                val teamAbbreviation = playerJson["TEAM_ABBREVIATION"] as? String ?: return@mapNotNull null
+                val teamAbbreviation =
+                    playerJson["TEAM_ABBREVIATION"] as? String ?: return@mapNotNull null
                 val team = Team.findTeamByShortName(teamAbbreviation) ?: return@mapNotNull null
                 val height = playerJson["HEIGHT"] as String
                 val weight = playerJson["WEIGHT"] as String
@@ -55,7 +57,20 @@ object TrackerService {
                 val playerStat = PlayerStat(points, assist, rebound)
                 val country = playerJson["COUNTRY"] as String
                 val college = playerJson["COLLEGE"] as String
-                PlayerInfo(playerId, firstName, lastName, jerseyNumber, position, team, height, weight, draft, playerStat, country, college)
+                PlayerInfo(
+                    playerId,
+                    firstName,
+                    lastName,
+                    jerseyNumber,
+                    position,
+                    team,
+                    height,
+                    weight,
+                    draft,
+                    playerStat,
+                    country,
+                    college
+                )
             }.sortedBy { it.fullName }
             return@withContext playerInfos.associateBy { it.id }
         }
@@ -98,34 +113,4 @@ object TrackerService {
         val lose = this["${type}Loss"] as Long
         return Record(win, lose)
     }
-
-    /*fun getPlayerInfo2() {
-        val jsoup = Jsoup.connect("https://www.nba.com/player/203507/giannis-antetokounmpo").post()
-        val document = jsoup.getElementById("__NEXT_DATA__")?.firstChild().toString()
-        val jsonParser = JSONParser()
-        val json = jsonParser.parse(document) as JSONObject
-        println(json)
-        *//*val elements = jsoup.getElementsByClass("PlayerView_pv__knZEH")
-        elements.forEach {
-            it.getElementsByTag("script").forEach { element ->
-                println(element)
-            }
-        }*//*
-    }
-
-    fun getTeamTest() {
-        val jsoup = Jsoup.connect(TEAM_URL).post()
-        *//*val elements = jsoup.getElementsByClass("TeamDivisions_divisionTeams__N6vcW")
-        elements.forEach {
-            val elements2 = it.getElementsByClass("TeamFigure_tfContent__Vxiyh")
-            println(elements2.first()?.getElementsByTag("a")?.get(0)?.text())
-        }*//*
-        val elements = jsoup.getElementsByClass("TeamDivisions_division__u3KUS")
-        elements.forEach {
-            val elements2 = it.getElementsByClass("TeamFigure_tfContent__Vxiyh")
-            elements2.forEach { element3 ->
-                println(element3.getElementsByTag("a")[0]?.text()*//*?.uppercase()?.replace(" ", "_")*//*)
-            }
-        }
-    }*/
 }

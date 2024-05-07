@@ -2,8 +2,8 @@ package kr.cosine.nbatracker.data
 
 import kr.cosine.nbatracker.enums.Position
 import kr.cosine.nbatracker.enums.Team
-import kr.cosine.nbatracker.util.FormatUtils.toCentimeter
-import kr.cosine.nbatracker.util.FormatUtils.toKilogram
+import kr.cosine.nbatracker.util.FormatUtil.toCentimeter
+import kr.cosine.nbatracker.util.FormatUtil.toKilogram
 import java.io.Serializable
 
 data class PlayerInfo(
@@ -21,11 +21,6 @@ data class PlayerInfo(
     val college: String
 ) : Serializable {
 
-    private companion object {
-        const val PLAYER_IMAGE_URL = "https://cdn.nba.com/headshots/nba/latest/1040x760/%d.png"
-        const val MAX_NAME_SIZE = 22
-    }
-
     val imageUrl = PLAYER_IMAGE_URL.format(id)
 
     val fullName = "$firstName $lastName"
@@ -42,4 +37,9 @@ data class PlayerInfo(
 
     val weightPound by lazy { "$weight lbs" }
     val weightKilogram by lazy { "${weight.toKilogram()}kg" }
+
+    private companion object {
+        const val PLAYER_IMAGE_URL = "https://cdn.nba.com/headshots/nba/latest/1040x760/%d.png"
+        const val MAX_NAME_SIZE = 22
+    }
 }
