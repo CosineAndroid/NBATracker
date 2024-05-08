@@ -193,7 +193,7 @@ private fun CategoryButton(
                 contentDescription = stringResource(imageDescriptionId),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(300.dp)
+                    .size(270.dp)
                     .clip(CircleShape)
                     .background(Color.CategoryImageBackground)
             )
