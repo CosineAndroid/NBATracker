@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,6 +59,7 @@ import kr.cosine.nbatracker.registry.TeamInfoRegistry
 import kr.cosine.nbatracker.service.TrackerService
 import kr.cosine.nbatracker.ui.theme.Color
 import kr.cosine.nbatracker.ui.theme.Font
+import java.net.SocketTimeoutException
 
 class MainActivity : ComponentActivity() {
 
@@ -67,11 +69,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         loadingViewModel.show()
         lifecycleScope.launch(Dispatchers.IO) {
-            val playerInfoMap = TrackerService.getPlayerInfoMap()
-            PlayerInfoRegistry.setPlayerInfoMap(playerInfoMap)
+            try {
+                val playerInfoMap = TrackerService.getPlayerInfoMap()
+                PlayerInfoRegistry.setPlayerInfoMap(playerInfoMap)
 
-            val teamInfoMap = TrackerService.getTeamInfoMap()
-            TeamInfoRegistry.setTeamInfoMap(teamInfoMap)
+                val teamInfoMap = TrackerService.getTeamInfoMap()
+                TeamInfoRegistry.setTeamInfoMap(teamInfoMap)
+            } catch (e: SocketTimeoutException) {
+                finish()
+            }
         }.invokeOnCompletion {
             loadingViewModel.hide()
         }
@@ -105,6 +111,22 @@ private fun Main(
 }
 
 @Composable
+private fun LoadingScreen() {
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        )
+    ) {
+        CircularProgressIndicator(
+            color = Color.White,
+            modifier = Modifier.clearAndSetSemantics {}
+        )
+    }
+}
+
+@Composable
 private fun MainCategoryButton(
     isLoading: Boolean,
     buttonClickScope: (Class<out ComponentActivity>) -> Unit
@@ -115,16 +137,18 @@ private fun MainCategoryButton(
     ) {
         CategoryButton(
             height = 0.5f,
-            title = "선수",
-            imageDrawableId = R.drawable.lebron_james
+            titleId = R.string.player,
+            imageDrawableId = R.drawable.lebron_james,
+            imageDescriptionId = R.string.main_player_image_description
         ) {
             if (isLoading) return@CategoryButton
             buttonClickScope(PlayerListActivity::class.java)
         }
         CategoryButton(
             height = 1f,
-            title = "컨퍼런스",
-            imageDrawableId = R.drawable.golden_state_warriors
+            titleId = R.string.conference,
+            imageDrawableId = R.drawable.golden_state_warriors,
+            imageDescriptionId = R.string.main_conference_image_description,
         ) {
             if (isLoading) return@CategoryButton
             buttonClickScope(ConferenceActivity::class.java)
@@ -135,8 +159,9 @@ private fun MainCategoryButton(
 @Composable
 private fun CategoryButton(
     height: Float,
-    title: String,
+    titleId: Int,
     imageDrawableId: Int,
+    imageDescriptionId: Int,
     clickScope: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -165,7 +190,7 @@ private fun CategoryButton(
         ) {
             Image(
                 painter = painterResource(imageDrawableId),
-                contentDescription = stringResource(R.string.main_player_image_description),
+                contentDescription = stringResource(imageDescriptionId),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(300.dp)
@@ -173,7 +198,7 @@ private fun CategoryButton(
                     .background(Color.CategoryImageBackground)
             )
             Text(
-                text = title,
+                text = stringResource(titleId),
                 fontSize = 70.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.CategoryText,
@@ -181,21 +206,6 @@ private fun CategoryButton(
                 modifier = Modifier
             )
         }
-    }
-}
-
-@Composable
-fun LoadingScreen() {
-    Dialog(
-        onDismissRequest = {},
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-        )
-    ) {
-        CircularProgressIndicator(
-            color = Color.White
-        )
     }
 }
 

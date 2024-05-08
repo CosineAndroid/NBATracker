@@ -25,7 +25,7 @@ object TrackerService {
 
     suspend fun getPlayerInfoMap(): Map<Long, PlayerInfo> {
         return withContext(Dispatchers.IO) {
-            val jsoup = Jsoup.connect(PLAYER_URL).get()
+            val jsoup = Jsoup.connect(PLAYER_URL).timeout(5000).get()
             val document = jsoup.getElementById("__NEXT_DATA__")?.firstChild().toString()
             val jsonParser = JSONParser()
             val json = jsonParser.parse(document) as JSONObject
@@ -77,7 +77,7 @@ object TrackerService {
     }
 
     fun getTeamInfoMap(): Map<Team, TeamInfo> {
-        val jsoup = Jsoup.connect(TEAM_URL).ignoreContentType(true).execute().body()
+        val jsoup = Jsoup.connect(TEAM_URL).timeout(5000).ignoreContentType(true).execute().body()
         val jsonParser = JSONParser()
         val json = jsonParser.parse(jsoup.toString()) as JSONObject
         val teams = json["list"] as JSONArray

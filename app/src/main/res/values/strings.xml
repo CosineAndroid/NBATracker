@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">NBATracker</string>
     <string name="main_player_image_description">lebron james</string>
-    <string name="player_toolbar">선수</string>
+    <string name="main_conference_image_description">golden state warriors</string>
+    <string name="player">선수</string>
     <string name="player_search_bar_image_description">검색</string>
     <string name="player_search_bar_hint">검색 (이름/팀/포지션)</string>
     <string name="player_card_draft">드래프트</string>
@@ -11,7 +12,7 @@
     <string name="player_card_college">대학</string>
     <string name="player_card_backspace_description">닫기</string>
     <string name="player_card_short_info">%s %d번 %s</string>
-    <string name="conference_toolbar">컨퍼런스</string>
+    <string name="conference">컨퍼런스</string>
     <string name="conference_rank">순위</string>
     <string name="conference_team">팀</string>
     <string name="conference_win">승</string>

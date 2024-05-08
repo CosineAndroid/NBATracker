@@ -64,7 +64,7 @@ private fun Main(teamClickScope: (TeamInfo) -> Unit) {
     )
     val coroutineScope = rememberCoroutineScope()
     Column {
-        Toolbar(stringResource(R.string.conference_toolbar))
+        Toolbar(stringResource(R.string.conference))
         SelectConference(pageState, coroutineScope)
         ConferenceTypeGuide()
         ScrollConferenceTeam(pageState, teamClickScope)

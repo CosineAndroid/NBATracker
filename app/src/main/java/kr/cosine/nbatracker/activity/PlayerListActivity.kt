@@ -86,7 +86,7 @@ private fun Main(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Toolbar(stringResource(R.string.player_toolbar))
+        Toolbar(stringResource(R.string.player))
         PlayerSearchBar(playerViewModel, playerListViewModel)
         PlayerCardList(playerViewModel, playerListViewModel, teamClickScope)
     }
