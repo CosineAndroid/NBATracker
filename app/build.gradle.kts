@@ -21,7 +21,7 @@ android {
         applicationId = "kr.cosine.nbatracker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
+        versionCode = 4
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,6 +41,9 @@ android {
 
     buildTypes {
         release {
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
