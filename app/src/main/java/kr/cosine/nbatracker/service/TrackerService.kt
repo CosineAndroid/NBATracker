@@ -52,9 +52,9 @@ object TrackerService {
                 val draftNumber = playerJson["DRAFT_NUMBER"] as? Long
                 val draft = Draft(draftYear, draftRound, draftNumber)
                 val points = playerJson["PTS"].toDoubleOrZero()
-                val assist = playerJson["AST"].toDoubleOrZero()
                 val rebound = playerJson["REB"].toDoubleOrZero()
-                val playerStat = PlayerStat(points, assist, rebound)
+                val assist = playerJson["AST"].toDoubleOrZero()
+                val playerStat = PlayerStat(points, rebound, assist)
                 val country = playerJson["COUNTRY"] as String
                 val college = playerJson["COLLEGE"] as String
                 PlayerInfo(
