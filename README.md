@@ -1,4 +1,6 @@
 # NBATracker - NBA 선수/팀 정보 확인
+* Jetpack Compose 씀
+
 [플레이스토어 바로가기](https://play.google.com/store/apps/details?id=kr.cosine.nbatracker)  
 [플레이스토어 바로가기](https://play.google.com/store/apps/details?id=kr.cosine.nbatracker)  
 [플레이스토어 바로가기](https://play.google.com/store/apps/details?id=kr.cosine.nbatracker)  
