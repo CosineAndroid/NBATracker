@@ -14,7 +14,7 @@ data class PlayerInfo(
     val position: Position,
     val team: Team,
     private val height: String,
-    private val weight: String,
+    private val weight: String?,
     val draft: Draft,
     val playerStat: PlayerStat,
     val country: String,
@@ -36,7 +36,7 @@ data class PlayerInfo(
     val heightCentimeter by lazy { "${height.toCentimeter()}cm" }
 
     val weightPound by lazy { "$weight lbs" }
-    val weightKilogram by lazy { "${weight.toKilogram()}kg" }
+    val weightKilogram by lazy { if (weight == null) "측정되지 않음" else "${weight.toKilogram()}kg" }
 
     private companion object {
         const val PLAYER_IMAGE_URL = "https://cdn.nba.com/headshots/nba/latest/1040x760/%d.png"
