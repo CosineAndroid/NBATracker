@@ -15,14 +15,14 @@ fun getProperties(key: String): String = properties[key].toString()
 
 android {
     namespace = "kr.cosine.nbatracker"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "kr.cosine.nbatracker"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 8
-        versionName = "1.1.0"
+        targetSdk = 36
+        versionCode = 9
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
