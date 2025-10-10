@@ -5,7 +5,6 @@ import kr.cosine.nbatracker.enums.Position
 import kr.cosine.nbatracker.enums.Team
 
 object PlayerInfoRegistry {
-
     private var playerInfoMap = emptyMap<Long, PlayerInfo>()
 
     fun getPlayerInfos(input: String = ""): List<PlayerInfo> {

@@ -35,7 +35,6 @@ object TrackerService {
 
             val playerInfos = players.mapNotNull {
                 val playerJson = it as JSONObject
-                println("playerJson: $playerJson")
                 val playerId = playerJson["PERSON_ID"] as Long
                 val firstName = playerJson["PLAYER_FIRST_NAME"] as String
                 val lastName = playerJson["PLAYER_LAST_NAME"] as String
@@ -46,7 +45,10 @@ object TrackerService {
                 val teamAbbreviation =
                     playerJson["TEAM_ABBREVIATION"] as? String ?: return@mapNotNull null
                 val team = Team.findTeamByShortName(teamAbbreviation) ?: return@mapNotNull null
-                val height = playerJson["HEIGHT"] as String
+                val height = playerJson["HEIGHT"] as? String
+                if (height == null) {
+                    println("$firstName $lastName")
+                }
                 val weight = playerJson["WEIGHT"] as? String
                 val draftYear = playerJson["DRAFT_YEAR"] as? Long
                 val draftRound = playerJson["DRAFT_ROUND"] as? Long

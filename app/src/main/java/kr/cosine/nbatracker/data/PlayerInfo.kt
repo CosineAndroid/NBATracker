@@ -13,14 +13,13 @@ data class PlayerInfo(
     val jerseyNumber: Int,
     val position: Position,
     val team: Team,
-    private val height: String,
+    private val height: String?,
     private val weight: String?,
     val draft: Draft,
     val playerStat: PlayerStat,
     val country: String,
     val college: String
 ) : Serializable {
-
     val imageUrl = PLAYER_IMAGE_URL.format(id)
 
     val fullName = "$firstName $lastName"
@@ -32,10 +31,8 @@ data class PlayerInfo(
         fullName
     }
 
-    val heightInchAndFeet by lazy { height.split("-").run { "${this[0]}' ${this[1]}''" } }
-    val heightCentimeter by lazy { "${height.toCentimeter()}cm" }
+    val heightCentimeter by lazy { if (height == null) "측정되지 않음" else "${height.toCentimeter()}cm" }
 
-    val weightPound by lazy { "$weight lbs" }
     val weightKilogram by lazy { if (weight == null) "측정되지 않음" else "${weight.toKilogram()}kg" }
 
     private companion object {
