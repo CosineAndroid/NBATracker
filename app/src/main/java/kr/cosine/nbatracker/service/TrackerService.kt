@@ -58,8 +58,8 @@ object TrackerService {
                 val rebound = playerJson["REB"].toDoubleOrZero()
                 val assist = playerJson["AST"].toDoubleOrZero()
                 val playerStat = PlayerStat(points, rebound, assist)
-                val country = playerJson["COUNTRY"] as String
-                val college = playerJson["COLLEGE"] as String
+                val country = playerJson["COUNTRY"] as? String
+                val college = playerJson["COLLEGE"] as? String
                 PlayerInfo(
                     playerId,
                     firstName,
